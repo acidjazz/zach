@@ -1,5 +1,7 @@
 </div>
 
+<?require_once '_fade.php'; ?>
+
 <div id="fb-root"></div>
 
 <script type="text/javascript">

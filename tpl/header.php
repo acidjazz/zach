@@ -18,10 +18,7 @@
 <script type="text/javascript" src="/jst/lib/jquery-1.8.2.js"></script>
 <script type="text/javascript" src="/jst/lib/jquery.transit.min.js"></script>
 <script type="text/javascript" src="/jst/lib/jquery.uploadify.js"></script>
-
 <script type="text/javascript" src="/jst/main.js?r=<?=rand(1,1000)?>"></script>
-
-<script type="text/javascript" src="/jst/photos.js?r=<?=rand(1,1000)?>"></script>
 
 </head>
 
