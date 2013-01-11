@@ -1,0 +1,7 @@
+
+RewriteEngine On
+RewriteRule ^img\/generated\/(.*)\.png$ /generate.php?id=$1 [L]
+RewriteRule ^img\/uploads\/(.*)\.(png|gif|jpeg|jpg)$ /upload.php?id=$1&ext=$2 [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php
