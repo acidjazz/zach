@@ -2,5 +2,23 @@
 extends layout
 
 block content
+
   .container 
-    include _landing
+    table.users
+      thead
+        tr
+          th name
+          th password
+          th created
+          th readable
+          th diff
+
+      tbody
+        each user in users
+          tr
+            td #{user.name}
+            td #{user.password}
+            td #{user.created}
+            td #{user.created_readable}
+            td #{user.created_diff}
+

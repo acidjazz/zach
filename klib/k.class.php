@@ -2,7 +2,7 @@
 
 class k {
 
-  public function hpr($obj, $return=false) {
+  public static function hpr($obj, $return=false) {
 
     $output = '';
 

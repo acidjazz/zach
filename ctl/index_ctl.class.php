@@ -6,7 +6,12 @@ class index_ctl {
 
     global $fb;
 
-    jade::c('index', array('options' => range(1, 500))); 
+    $users = array();
+    foreach (user::find() as $user) {
+      $users[] = (new user($user))->data();
+    }
+
+    jade::c('index', ['users' => $users]); 
 
   }
 

@@ -27,10 +27,18 @@ li {
   height: 100%;
   background: url("/img/opacity/blue_90.png");
 }
-.landing {
-  margin: 30px;
-}
-.landing .cta {
-  padding: 20px;
+.users {
   border: 1px solid #666;
+  margin: 100px auto;
+}
+.users tbody tr:nth-child(even) {
+  background: #ccc;
+}
+.users tbody tr:nth-child(odd) {
+  background: #eee;
+}
+.users td {
+  margin: none;
+  border: none;
+  padding: 5px 10px;
 }
