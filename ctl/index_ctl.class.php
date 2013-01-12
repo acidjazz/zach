@@ -6,11 +6,8 @@ class index_ctl {
 
     global $fb;
 
-    $data = $fb->data();
-    if (isset($data['strip'])) {
-      $strip = $data['strip'];
-    }
-    require_once 'tpl/home.php';
+    jade::c('index', array('options' => range(1, 500))); 
+
   }
 
 }

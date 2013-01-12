@@ -11,14 +11,22 @@ class kdebug {
       exit;
     }
 
-		echo $this->headers();
-		echo self::$errors;
 		//echo $this->database(kdb::$debug);
-		echo $this->egpcs();
+    if (defined('KDEBUG_EGPCS') && KDEBUG_EGPCS != false || self::$errors != null) {
+		  echo $this->headers();
+    }
+
+    if (defined('KDEBUG_EGPCS') && KDEBUG_EGPCS != false) {
+		  echo $this->egpcs();
+    }
+
+    if (self::$errors != null) {
+		  echo self::$errors;
+    }
 
 	}
 
-	public function init() {
+	public static function init() {
 		new kdebug;
 	}
 
@@ -486,6 +494,10 @@ HTML;
 		foreach ($array as $key=>$value) {
 
 			$count--;
+
+      if (!isset($return)) {
+        $return = '';
+      }
 
 			$return .= '<div class="kdebug_var'.
 				($top ? ' kdebug_var_top' : '').
