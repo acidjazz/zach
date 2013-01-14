@@ -20,7 +20,13 @@ class jade {
       trigger_error('Template not found: "'.$template.'"');
     }
 
-    $cmd = "jade -p ".$path.$template." -P -o '$json' < ".$path.$template;
+    $temp = tmpfile();
+    $file = tempnam(sys_get_temp_dir(), 'json_');
+    $handle = fopen($file, 'w');
+    fwrite($handle, $json);
+    fclose($handle);
+
+    $cmd = "jade -p ".$path.$template." -P --obj '$file' < ".$path.$template;
 
     $test = exec($cmd, $results, $code);
     $output = join("\r\n", $results);
@@ -28,13 +34,16 @@ class jade {
     if ($code > 0) {
       exec($cmd.' 2>&1', $results, $code);
       trigger_error("Jade compilation error: <pre>".join("\n", $results)."</pre>");
+      unlink($file);
       return false;
     }
 
     if ($return) {
+      unlink($file);
       return $output;
     }
 
+    unlink($file);
     echo $output;
 
   }
