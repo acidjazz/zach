@@ -1,1 +1,1 @@
-# Dolby red carpet cover and profile photo customizer
+# lightweight framework involving php 5.4.9, stylus, and jade.
