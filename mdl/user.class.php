@@ -2,10 +2,12 @@
 
 class user extends kcol {
 
+  // restrict types of fields
   protected $_types = [
     'created' => 'date'
   ];
 
+  // specify your overrode fields
   protected $_ols = [
     'created_readable',
     'created_diff'
