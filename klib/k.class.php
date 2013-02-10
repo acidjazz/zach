@@ -10,7 +10,7 @@ class k {
 
     $output = <<<HTML
     <pre style="
-      font-size: 12px;
+      font-size: 13px;
       font-family: 'lucida grande', tahoma, verdana, arial, sans-serif;
       color: #333;
       border: 1px solid #d0d0d0; 
@@ -40,14 +40,17 @@ HTML;
 
   }
 
-  public function highlight($text,$type='php',$nopre=false) {
+  public static function highlight($text,$type='php',$nopre=false) {
 
     $text = preg_replace("/^\n/i", "", $text);
 
-    $file = 'highlight'.rand(100,10000);
-    file_put_contents('/tmp/'.$file,$text);
-    $highlighted = shell_exec("highlight -f --style neon --syntax=$type < /tmp/$file");
-    unlink('/tmp/'.$file);
+    $temp = tmpfile();
+    $file = tempnam(sys_get_temp_dir(), 'highlight_');
+    $handle = fopen($file, 'w');
+    fwrite($handle, $text);
+    fclose($handle);
+    $highlighted = shell_exec("highlight -f --style neon --syntax=$type < $file");
+    unlink($file);
     if ($nopre == false) {
       return str_replace("\n", '<br />', $highlighted);
     }
@@ -56,7 +59,7 @@ HTML;
 
   }
 
-  public function cpr($code, $type='sql', $return=false, $br=false) {
+  public static function cpr($code, $type='sql', $return=false, $br=false) {
 
     $data = null;
 
@@ -86,7 +89,7 @@ HTML;
       border-radius: 5px;
       border: 1px solid #e7e7e7;
       font-family: 'lucida grande', tahoma, verdana, arial, sans-serif;
-      font-size: 14px;
+      font-size: 13px;
       margin: 5px;
       padding: 5px;
       background-color: #efefef;
@@ -106,64 +109,5 @@ HTML;
     echo $data;
 
   }
-
-  function xmliindent($xml) {  
-
-    $xml = preg_replace('/(>)(<)(\/*)/', "$1\n$2$3", $xml);
-    $token      = strtok($xml, "\n");
-    $result     = '';
-    $pad        = 0;
-    $matches    = array();
-
-    while ($token !== false) {
-      if (preg_match('/.+<\/\w[^>]*>$/', $token, $matches))
-        $indent=0;
-      elseif (preg_match('/^<\/\w/', $token, $matches)) 
-        $pad--;
-      elseif (preg_match('/^<\w[^>]*[^\/]>.*$/', $token, $matches))
-        $indent=1;
-      else
-        $indent = 0; 
-
-      $line    = str_pad($token, strlen($token)+$pad, "\t", STR_PAD_LEFT);
-      $result .= $line . "\n";
-      $token   = strtok("\n");
-      $pad    += $indent;
-    }
-
-    return $result;
-  }
-
-  function xmlindent($xml, $html_output=false) {  
-
-      $xml_obj = new SimpleXMLElement($xml);  
-      $level = 4;  
-      $indent = 0;
-      $pretty = array();  
-        
-      $xml = explode("\n", preg_replace('/>\s*</', ">\n<", $xml_obj->asXML()));  
-    
-      if (count($xml) && preg_match('/^<\?\s*xml/', $xml[0])) {  
-        $pretty[] = array_shift($xml);  
-      }  
-    
-      foreach ($xml as $el) {  
-        if (preg_match('/^<([\w])+[^>\/]*>$/U', $el)) {  
-            $pretty[] = str_repeat("\t", $indent) . $el;  
-            $indent += $level;  
-        } else {  
-          if (preg_match('/^<\/.+>$/', $el)) {              
-            $indent -= $level;
-          }  
-          if ($indent < 0) {  
-            $indent += $level;  
-          }  
-          $pretty[] = str_repeat("\t", $indent) . $el;  
-        }  
-      }     
-      $xml = implode("\n", $pretty);     
-      return ($html_output) ? htmlentities($xml) : $xml;  
-  }  
-    
 
 }

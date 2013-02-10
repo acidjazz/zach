@@ -36,17 +36,17 @@ class kdebug {
 		$blue_background = '#ebeafd';
 		$blue_over = '#bfbbff';
 
-		$red_border = '#ff8686';
-		$red_background = '#fdeaea';
-		$red_over = '#ffbbbb';
+    $error_bg = '#fb8d8d';
+    $error_border = '#c06c6c';
+    $error_hover = '#b33636';
 
-		$green_border = '#5bd34a';
-		$green_background = '#eafdea';
-		$green_over = '#c3ffbb';
+    $egpcs_border = '#6c99c0';
+		$egpcs_bg = '#8dc8fb';
+		$egpcs_hover = '#3665b3';
 
-		$black_border = '#777';
-		$black_background = '#efefef';
-		$black_alter = '#e0e0e0';
+		$black_border = '#cdcdcd';
+		$black_background = '#fff';
+		$black_alter = '#efefef';
 
 		$code_error = '#f9fbbc';
 
@@ -67,41 +67,52 @@ class kdebug {
 
 .kdebug_container {
 	font-family: 'lucida grande', tahoma, verdana, arial, sans-serif;
-	font-size: 12px;
+	font-size: 13px;
 	color: #333;
-	margin: 5px;
-	border-radius: {$curve}px;
-	-webkit-border-radius: {$curve}px;
+  cursor: pointer;
+  margin: 5px;
 }
 
 .kdebug_blue {
-	border: 1px solid $blue_border;
 	background-color: $blue_background;
 }
 
-.kdebug_red {
-	border: 1px solid $red_border;
-	background-color: $red_background;
+.kdebug_error {
+	background-color: $error_bg;
 }
 
-.kdebug_green {
-	border: 1px solid $green_border;
-	background-color: $green_background;
+.kdebug_egpcs {
+	background-color: $egpcs_bg;
+  border: 1px solid $egpcs_border;
 }
 
-.kdebug_over_blue,.kdebug_over_red,.kdebug_over_green {
-	border-radius: {$curve}px;
-	-webkit-border-radius: {$curve}px;
-	cursor: pointer;
+.kdebug_error {
+	background-color: $error_bg;
+  border: 1px solid $error_border;
 }
 
-.kdebug_over_blue { background-color: $blue_over; }
-.kdebug_over_red { background-color: $red_over; }
-.kdebug_over_green { background-color: $green_over; }
+.kdebug_egpcs, .kdebug_error {
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.5);
+}
 
+.kdebug_blue div:hover { background-color: $blue_over; }
+
+.kdebug_error .kdebug_handler_title:hover { 
+  background-color: $error_hover; 
+  color: #fff;
+}
+
+.kdebug_egpcs .kdebug_vars_title {
+  border-bottom: 1px solid $egpcs_border;
+}
+
+.kdebug_egpcs .kdebug_vars_title:hover { 
+  background-color: $egpcs_hover; 
+  color: #fff;
+}
 
 .kdebug_handler_title,.kdebug_db_title,.kdebug_db_query,.kdebug_rows,.kdebug_vars_title {
-	padding: 5px;
+	padding: 10px;
 }
 
 .kdebug_rows,.kdebug_db_queries {
@@ -117,7 +128,7 @@ class kdebug {
 }
 
 .kdebug_rows th, .kdebug_rows td {
-	font-size: 12px;
+	font-size: 13px;
 	padding: 2px 10px 2px 10px;
 }
 
@@ -142,11 +153,13 @@ class kdebug {
 
 .kdebug_right {
 	float: right;
-	font-size: 10px;
+	font-size: 13px;
 }
 
 .kdebug_code {
-	border-top: 1px solid $red_border;
+	border-left: 1px solid $error_bg;
+	border-right: 1px solid $error_bg;
+	border-bottom: 1px solid $error_bg;
 	display: none;
 }
 
@@ -159,10 +172,16 @@ class kdebug {
 .kdebug_code li {
 	border-bottom: 1px solid #efefef;
 	padding: 2px;
+  font-size: 14px;
+  font-family: Fixed, monospace;
 }
 
 .kdebug_code_alter {
 	background-color: #f4f4f4;
+}
+
+.kdebug_code_error {
+	background-color: $code_error; 
 }
 
 .kdebug_code_line {
@@ -170,7 +189,7 @@ class kdebug {
 }
 
 .kdebug_code_error {
-	background-color: $code_error; 
+  font-weight: bold;
 }
 
 .kdebug_code_linenum {
@@ -203,15 +222,25 @@ class kdebug {
 	overflow: hidden;
 	float: left;
 	border-right: 1px dotted $black_border;
+  color: #333;
+}
+
+.kdebug_key_more {
+  color: #000;
 }
 
 .kdebug_var {
 	background-color: $black_background;
 	padding: 5px 0 5px 5px;
 	margin: 0 0 0 5px;
+  color: #333;
 	border-left: 1px solid $black_border;
 	border-right: 1px solid $black_border;
-	border-bottom: 1px solid $black_border;
+}
+
+.kdebug_var:hover {
+  background-color: #c9e3f9;
+
 }
 
 .kdebug_vars {
@@ -262,7 +291,7 @@ if (window.jQuery === undefined || window.jQuery.fn.jquery !== '1.4.2') {
     var script_tag = document.createElement('script');
     script_tag.setAttribute("type","text/javascript");
     script_tag.setAttribute("src",
-    	"http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js");
+    	"http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js");
     script_tag.onload = scriptLoadHandler;
     script_tag.onreadystatechange = function () { // same thing but for IE
     	if (this.readyState == 'complete' || this.readyState == 'loaded') {
@@ -282,31 +311,23 @@ function scriptLoadHandler() {
 
 function main() { 
     jQuery(document).ready(function($) { 
-			$('.kdebug_handler_title').hover(function(event) { $(this).toggleClass('kdebug_over_red'); });
-			$('.kdebug_handler_title').click(function(event) { $(this).next('.kdebug_code').toggle(100); });
-
-			$('.kdebug_db_query').hover(function(event) { $(this).toggleClass('kdebug_over_blue'); });
-			$('.kdebug_db_query').click(function(event) { $(this).next('.kdebug_rows').toggle(100); });
-
-			$('.kdebug_db_title').hover(function(event) { $(this).toggleClass('kdebug_over_blue'); });
-			$('.kdebug_db_title').click(function(event) { $(this).next('.kdebug_db_queries').toggle(100); });
-
-			$('.kdebug_vars_title').hover(function(event) { $(this).toggleClass('kdebug_over_green'); });
-			$('.kdebug_vars_title').click(function(event) { $(this).next('.kdebug_vars ').toggle(100); });
-
-			$('.kdebug_array').hover(function(event) { $(this).toggleClass('kdebug_black_over'); });
-			$('.kdebug_array').click(function(event) { $(this).next('.kdebug_vars').toggle(100); });
+			$('.kdebug_handler_title').click(function(event) { $(this).next('.kdebug_code').toggle(0); });
+			$('.kdebug_db_query').click(function(event) { $(this).next('.kdebug_rows').toggle(0); });
+			$('.kdebug_db_title').click(function(event) { $(this).next('.kdebug_db_queries').toggle(0); });
+			$('.kdebug_vars_title').click(function(event) { $(this).next('.kdebug_vars ').toggle(0); });
+			$('.kdebug_array').click(function(event) { $(this).next('.kdebug_vars').toggle(0); });
     });
 }
 
 })(); 
 
 </script>
+<div class="kdebug_main_container">
 HTML;
 
 	}
 
-	public function handler($errno, $errstr, $errfile, $errline) {
+	public static function handler($errno, $errstr, $errfile, $errline) {
 
 	$errortype = array(
 		E_ERROR							=> 'Error',
@@ -335,7 +356,7 @@ HTML;
 
 	self::$errors .= <<<HTML
 
-<div class="kdebug_container kdebug_red">
+<div class="kdebug_container kdebug_error">
 	<div class="kdebug_handler_title">
 		<div class="kdebug_right">$errfile:$errline</div>
 		<b>{$errortype[$errno]}</b>: $errstr
@@ -450,7 +471,7 @@ HTML;
 		);
 
 		$return = <<<HTML
-	<div class="kdebug_container kdebug_green">
+	<div class="kdebug_container kdebug_egpcs">
 HTML;
 		$found = false;
 
@@ -508,7 +529,7 @@ HTML;
 			$first = $top = false;
 
 			if (is_array($value)) {
-				$return .= "<div class=\"kdebug_key\" title=\"$key\"> $key </div>";
+				$return .= "<div class=\"kdebug_key kdebug_key_more\" title=\"$key\"> $key </div>";
 				$return .= $this->array_dimlen_format($value).'</div>';
 				$return .= '<div class="kdebug_vars">'.$this->array_tree($value, false).'</div>';
 			} else {
@@ -615,4 +636,5 @@ HTML;
 		return $return;
 
 	}
+
 }

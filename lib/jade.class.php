@@ -33,9 +33,27 @@ class jade {
 
     if ($code > 0) {
       exec($cmd.' 2>&1', $results, $code);
-      trigger_error("Jade compilation error: <pre>".join("\n", $results)."</pre>");
       unlink($file);
+
+      if (defined('KDEBUG_HANDLER') && KDEBUG_HANDLER == true) {
+
+        if (preg_match('/(.*)Error: (.*)\:(.*)/i', $results[4], $matches)) {
+          foreach ($results as $key=>$value) {
+            if ($value == '') {
+              $errormessage = $results[$key+1];
+            }
+          }
+          kdebug::handler(E_ERROR, '<b>JADE</b>: '.$errormessage, $matches[2], $matches[3]);
+        } else {
+          trigger_error("Jade compilation error: <pre>".join("\n", $results)."</pre>");
+        }
+
+      } else {
+        trigger_error("Jade compilation error: <pre>".join("\n", $results)."</pre>");
+      }
+
       return false;
+
     }
 
     if ($return) {
