@@ -71,17 +71,18 @@ class kdebug {
 	font-size: 13px;
 	color: #333;
   cursor: pointer;
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.5);
+  margin: 3px 0;
 
 }
 
 .kdebug_main_container {
   margin: 5px;
-  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.5);
 }
 
 .kdebug_top {
   position: absolute;
-  width: 99%;
+  width: 98%;
   top: 10px;
 }
 

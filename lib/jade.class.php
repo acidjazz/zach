@@ -43,7 +43,7 @@ class jade {
               $errormessage = $results[$key+1];
             }
           }
-          kdebug::handler(E_ERROR, '<b>JADE</b>: '.$errormessage, $matches[2], $matches[3]);
+          kdebug::handler(E_ERROR, '<b>[JADE]</b> '.$errormessage, $matches[2], $matches[3]);
         } else {
           trigger_error("Jade compilation error: <pre>".join("\n", $results)."</pre>");
         }
