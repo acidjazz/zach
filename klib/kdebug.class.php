@@ -11,7 +11,7 @@ class kdebug {
       exit;
     }
 
-		//echo $this->database(kdb::$debug);
+		echo $this->database(kdb::$debug);
     if (defined('KDEBUG_EGPCS') && KDEBUG_EGPCS != false || self::$errors != null) {
 		  echo $this->headers();
     }
@@ -33,9 +33,9 @@ class kdebug {
 
 	private function headers() {
 
-		$blue_border =  '#8986ff';
-		$blue_background = '#ebeafd';
-		$blue_over = '#bfbbff';
+		$sql_border =  '#8986ff';
+		$sql_background = '#ebeafd';
+		$sql_over = '#bfbbff';
 
     $error_bg = '#fb8d8d';
     $error_border = '#c06c6c';
@@ -73,7 +73,6 @@ class kdebug {
   cursor: pointer;
   box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.5);
   margin: 3px 0;
-
 }
 
 .kdebug_main_container {
@@ -84,6 +83,11 @@ class kdebug {
   position: absolute;
   width: 98%;
   top: 10px;
+}
+
+.kdebug_sql {
+	border: 1px solid $sql_border;
+	background-color: $sql_background;
 }
 
 .kdebug_error {
@@ -120,6 +124,43 @@ class kdebug {
 .kdebug_handler_title,.kdebug_rows,.kdebug_vars_title {
 	padding: 10px;
 }
+
+.kdebug_rows,.kdebug_db_queries {
+	display: none;
+}
+
+.kdebug_rows table {
+  margin: 5px;
+	border: 1px solid $sql_border;
+	border-radius: {$curve}px;
+	-webkit-border-radius: {$curve}px;
+}
+
+.kdebug_rows th, .kdebug_rows td {
+	font-size: 12px;
+	padding: 2px 10px 2px 10px;
+}
+
+.kdebug_rows th {
+	color: $sql_background;
+	background-color: $sql_border;
+}
+
+.kdebug_rows_alter {
+	background-color: #f4f4f4;
+}
+
+.kdebug_rows div {
+	font-family: 'lucida grande', tahoma, verdana, arial, sans-serif;
+	padding: 10px;
+	background-color: #fff;
+	border: 1px solid #efefef;
+	border-radius: {$curve}px;
+	-webkit-border-radius: {$curve}px;
+  overflow: wrap;
+}
+
+
 
 .kdebug_right {
 	float: right;
@@ -269,6 +310,12 @@ function scriptLoadHandler() {
 
 function main() { 
   jQuery(document).ready(function($) { 
+
+    $('.kdebug_db_query').hover(function(event) { $(this).toggleClass('kdebug_over_blue'); });
+    $('.kdebug_db_query').click(function(event) { $(this).next('.kdebug_rows').toggle(100); });
+    $('.kdebug_db_title').hover(function(event) { $(this).toggleClass('kdebug_over_blue'); });
+    $('.kdebug_db_title').click(function(event) { $(this).next('.kdebug_db_queries').toggle(100); });
+
     $('.kdebug_handler_title').click(function(event) { $(this).next('.kdebug_code').toggle(0); });
     $('.kdebug_vars_title, .kdebug_array').click(function(event) { $(this).next('.kdebug_vars ').toggle(0); });
     $(document).keydown(function(e) {
@@ -344,6 +391,86 @@ HTML;
 
 HTML;
 
+	}
+
+	private function database($conns) {
+
+		$return = null;
+
+    if (!empty($conns) && count($conns) > 0) {
+		foreach ($conns as $key=>$conn) {
+			$total_runtime = round($conn['total_runtime'], 4);
+
+			$return .= <<<HTML
+<div class="kdebug_container kdebug_blue">
+
+	<div class="kdebug_db_title" title="{$conn['stats']}"><u>{$key}</u> {$conn['query_count']} queries in $total_runtime seconds</div>
+
+	<div class="kdebug_db_queries">
+HTML;
+
+			foreach ($conn['queries'] as $query=>$data) {
+        if (strlen($query) < 5000) {
+  				$query = highlight($query, 'sql', true);
+        } else {
+  				$query = highlight(substr($query, 0, 1000).'.. ( truncated '.number_format(strlen($query)).' characters )', 'sql', true);
+        }
+        if (isset($data['runtime'])) {
+				  $runtime = round($data['runtime'], 4);
+        } else {
+				  $runtime = 0;
+        }
+				$return .= <<<HTML
+	<div class="kdebug_db_query">
+		<div class="kdebug_right">{$data['rows']} returned {$data['affected']} affected in $runtime seconds</div>
+		<div class="kdebug_query_summary">{$query}</div>
+	</div>
+	<div class="kdebug_rows">
+    <div>{$query}</div>
+HTML;
+
+				if ($data['rows'] > 0) {
+					$return .= <<<HTML
+			<table border="0" cellspacing="0" cellpadding="0">
+				<tr>
+HTML;
+				}
+				if (isset($data['data'][0])) {
+          foreach (array_keys($data['data'][0]) as $field) {
+            $return .= "<th>$field</th>";
+          }
+				$return .= "</tr>";
+        }
+
+				foreach ($data['data'] as $key=>$row) {
+					$return .= (($key%2) ? '<tr>' : '<tr class="kdebug_rows_alter">');
+					foreach ($row as $name=>$value) {
+
+            if (strlen($value) > 1000) {
+						  $return .= '<td>'.substr($value, 0, 100).'.. (truncated '.number_format(strlen($value)).' characters ) </td>';
+            } else {
+						  $return .= "<td>$value</td>";
+            }
+
+					}
+					$return .= "</tr>";
+				}
+
+
+				if ($data['rows'] > 0) {
+					$return .= '</table>';
+				}
+				$return .= '</div>';
+			}
+
+			$return .= '</div>';
+		}
+    }
+			$return .= '</div>';
+
+
+		return $return;
+	
 	}
 
 	public function egpcs() {
@@ -437,13 +564,13 @@ HTML;
 
 	}
 
-	private function array_dimlen_format($array) {
-		list($count, $elements) = $this->array_dimlen($array);
+	private static function array_dimlen_format($array) {
+		list($count, $elements) = self::array_dimlen($array);
 		return "($count dimension".($count == 1  ? '' : 's').", $elements element".($elements == 1 ? '' : 's').")";
 	}
 
 
-	private function array_dimlen($array,$count=0,$elements=false) {
+	private static function array_dimlen($array,$count=0,$elements=false) {
 
 		if (is_array($array)) {
 
@@ -451,7 +578,7 @@ HTML;
 
 			foreach ($array as $key=>$value) {
 				if (is_array($value)) {
-					list($count, $elements) = $this->array_dimlen($value, $count, $elements);
+					list($count, $elements) = self::array_dimlen($value, $count, $elements);
 				}
 			}
 
@@ -461,21 +588,21 @@ HTML;
 
 	}
 
-	public function array_generate($array=null) {
+	public static function array_generate($array=null) {
 
 		$elements = rand(4,10);
 
 		for ($i=0; $i != $elements; $i++) {
 
-			list($dimlen) = $this->array_dimlen($array);
+			list($dimlen) = self::array_dimlen($array);
 			if ($array != null && $dimlen > 3) {
 				return $array;
 			}
 
-			$array[$this->string_generate(true)] = $this->string_generate();
+			$array[self::string_generate(true)] = self::string_generate();
 
 			if (!rand(0,$elements)) {
-				$array[$this->string_generate(true)] = $this->array_generate();
+				$array[self::string_generate(true)] = self::array_generate();
 				continue;
 			}
 
@@ -486,7 +613,7 @@ HTML;
 
 	}
 
-	private function string_generate($short=false) {
+	public static function string_generate($short=false) {
 
 		$chars = rand(2,15);
 		if ($short) {
