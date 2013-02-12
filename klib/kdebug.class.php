@@ -11,13 +11,17 @@ class kdebug {
       exit;
     }
 
-		echo $this->database(kdb::$debug);
+
     if (defined('KDEBUG_EGPCS') && KDEBUG_EGPCS != false || self::$errors != null) {
 		  echo $this->headers();
     }
 
     if (defined('KDEBUG_EGPCS') && KDEBUG_EGPCS != false) {
 		  echo $this->egpcs();
+    }
+
+    if (defined('KDEBUG_SQL') && KDEBUG_SQL != false) {
+		  echo $this->database(kdb::$debug);
     }
 
     if (self::$errors != null) {
@@ -33,9 +37,9 @@ class kdebug {
 
 	private function headers() {
 
-		$sql_border =  '#8986ff';
-		$sql_background = '#ebeafd';
-		$sql_over = '#bfbbff';
+		$sql_border =  '#7f9948';
+		$sql_background = '#a6c85e';
+		$sql_hover = '#3665b3';
 
     $error_bg = '#fb8d8d';
     $error_border = '#c06c6c';
@@ -87,11 +91,11 @@ class kdebug {
 
 .kdebug_sql {
 	border: 1px solid $sql_border;
-	background-color: $sql_background;
 }
 
-.kdebug_error {
-	background-color: $error_bg;
+.kdebug_db_title {
+  padding: 10px;
+	background-color: $sql_background;
 }
 
 .kdebug_egpcs {
@@ -121,48 +125,68 @@ class kdebug {
   color: #fff;
 }
 
-.kdebug_handler_title,.kdebug_rows,.kdebug_vars_title {
+.kdebug_sql .kdebug_db_title:hover { 
+  background-color: $sql_hover; 
+  color: #fff;
+}
+
+.kdebug_handler_title,.kdebug_vars_title {
 	padding: 10px;
 }
 
-.kdebug_rows,.kdebug_db_queries {
+.kdebug_query_summary {
+  padding: 10px;
+  border-bottom: 1px solid #777;
+}
+
+.kdebug_query_summary:hover {
+  background-color: #efefef;
+}
+
+.kdebug_rows, .kdebug_db_queries {
 	display: none;
 }
 
+.kdebug_rows {
+  overflow-x: auto;
+	background-color: #dfdfdf;
+}
+
+.kdebug_db_queries {
+  background-color: #fff;
+}
+
 .kdebug_rows table {
-  margin: 5px;
+  margin: 5px 5px 5px 20px;
 	border: 1px solid $sql_border;
-	border-radius: {$curve}px;
-	-webkit-border-radius: {$curve}px;
 }
 
 .kdebug_rows th, .kdebug_rows td {
 	font-size: 12px;
 	padding: 2px 10px 2px 10px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .kdebug_rows th {
-	color: $sql_background;
+	color: #fff;
 	background-color: $sql_border;
 }
 
 .kdebug_rows_alter {
 	background-color: #f4f4f4;
 }
+.kdebug_rows_inner {
+	background-color: #fff;
+}
 
 .kdebug_rows div {
-	font-family: 'lucida grande', tahoma, verdana, arial, sans-serif;
-	padding: 10px;
-	background-color: #fff;
-	border: 1px solid #efefef;
-	border-radius: {$curve}px;
-	-webkit-border-radius: {$curve}px;
+	padding: 10px 0 10px 20px;
   overflow: wrap;
 }
 
-
-
 .kdebug_right {
+  padding: 10px;
 	float: right;
 	font-size: 13px;
 }
@@ -402,7 +426,7 @@ HTML;
 			$total_runtime = round($conn['total_runtime'], 4);
 
 			$return .= <<<HTML
-<div class="kdebug_container kdebug_blue">
+<div class="kdebug_container kdebug_sql">
 
 	<div class="kdebug_db_title" title="{$conn['stats']}"><u>{$key}</u> {$conn['query_count']} queries in $total_runtime seconds</div>
 
@@ -443,7 +467,7 @@ HTML;
         }
 
 				foreach ($data['data'] as $key=>$row) {
-					$return .= (($key%2) ? '<tr>' : '<tr class="kdebug_rows_alter">');
+					$return .= (($key%2) ? '<tr class="kdebug_rows_inner">' : '<tr class="kdebug_rows_alter">');
 					foreach ($row as $name=>$value) {
 
             if (strlen($value) > 1000) {
