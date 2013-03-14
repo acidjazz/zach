@@ -12,7 +12,7 @@ class kdebug {
     }
 
 
-    if (defined('KDEBUG_EGPCS') && KDEBUG_EGPCS != false || self::$errors != null) {
+    if (defined('KDEBUG_EGPCS') && KDEBUG_EGPCS != false && $this->egpcs_set() || self::$errors != null) {
 		  echo $this->headers();
     }
 
@@ -186,7 +186,6 @@ class kdebug {
 }
 
 .kdebug_right {
-  padding: 10px;
 	float: right;
 	font-size: 13px;
 }
@@ -497,9 +496,9 @@ HTML;
 	
 	}
 
-	public function egpcs() {
+  private function egpcs_globals() {
 
-		global $_OTHER;
+	  global $_OTHER;
 
 		$superglobals = array(
 			'$_ENV' => &$_ENV,
@@ -511,6 +510,31 @@ HTML;
 			'$_OTHER' => &$_OTHER
 		);
 
+    return $superglobals;
+
+  }
+
+  private function egpcs_set() {
+
+    foreach ($this->egpcs_globals() as $key=>$value) {
+
+      if (is_array($value) && count($value) > 0) {
+        return true;
+      }
+
+      if (!is_array($value) && !empty($value)) {
+        return true;
+      }
+
+    }
+
+    return false;
+  }
+
+	public function egpcs() {
+
+    $superglobals = $this->egpcs_globals();
+	
 		$return = <<<HTML
 	<div class="kdebug_container kdebug_egpcs">
 HTML;
