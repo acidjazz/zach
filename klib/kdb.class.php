@@ -16,9 +16,7 @@ class kdb {
 	private static $signature;
 
 	public function __construct($params=array()) {
-
 		self::$_instance = $this;
-
 	}
 
 	public static function i($params=array()) {
@@ -39,7 +37,11 @@ class kdb {
 
 	public function connect($params=array()) {
 
-    $params = array_merge(array('host' => DB_HOST, 'user' => DB_USER, 'pass' => DB_PASSWORD, 'db' => DB_DATABASE), $params);
+    if (is_array($params)) {
+      $params = array_merge(array('host' => DB_HOST, 'user' => DB_USER, 'pass' => DB_PASSWORD, 'db' => DB_DATABASE), $params);
+    } else {
+      $params = array('host' => DB_HOST, 'user' => DB_USER, 'pass' => DB_PASSWORD, 'db' => DB_DATABASE);
+    }
     self::$connection[self::$_host] = new mysqli($params['host'], $params['user'], $params['pass'], $params['db']);
 	
 		if ($this->debug()) {
